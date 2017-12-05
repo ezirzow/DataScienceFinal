@@ -12,8 +12,8 @@ knitr::opts_chunk$set(cache=TRUE)
 library(tidyverse)
 library(bbr)
 year<-get_season(2018)
-playerRankings <- transmute(year, player, tm, PointsRank=(((pts/g)/20)*.25), ReboundsRank=(((trb/g)/10)*.2), AssistsRank=(((ast/g)/5)*.2), StealsRank=(((stl/g)/1.5)*.1), BlocksRank=(((blk/g)/1)*.1), TurnoversRank=(((tov/g)/3)*.1), PctRank=(((fg_pct)/.4)*.05), OverallRank=PointsRank+ReboundsRank+AssistsRank+StealsRank+BlocksRank-TurnoversRank+PctRank)%>%top_n(15)%>%arrange(desc(OverallRank))
-rankingsForTable<-transmute(playerRankings, player, tm, OverallRank)
+playerRankings <- transmute(year, player, tm, pos, PointsRank=(((pts/g)/20)*.25), ReboundsRank=(((trb/g)/10)*.2), AssistsRank=(((ast/g)/5)*.2), StealsRank=(((stl/g)/1.5)*.1), BlocksRank=(((blk/g)/1)*.1), TurnoversRank=(((tov/g)/3)*.1), PctRank=(((fg_pct)/.4)*.05), OverallRank=PointsRank+ReboundsRank+AssistsRank+StealsRank+BlocksRank-TurnoversRank+PctRank)%>%top_n(15)%>%arrange(desc(OverallRank))
+rankingsForTable<-transmute(playerRankings, player, tm, pos, OverallRank)
 ```
 
 ##Points
@@ -46,15 +46,13 @@ blocks<-filter(year,blk/g>1.5)
 ggplot(data=blocks)+geom_col(mapping=aes(x=player,y=blk/g, fill=blk))+coord_flip()
 ```
 
-##Top 15 Table
-
+##Top 10 Table
 ```{r, warning=FALSE, message=FALSE}
 knitr::kable(rankingsForTable%>%top_n(10), caption = "Overall Rankings")
 ```
 
 ##Graph of Top 5
-
 ```{r}
-playerRankings %>% top_n(5) %>% select(-OverallRank) %>% gather(skill, rating, -player)  %>%
+playerRankings %>% top_n(5) %>% select(-OverallRank) %>% gather(skill, rating, -player, -tm, -pos) %>%
   ggplot(aes(x=skill, y=rating, group=player,color=player))+geom_point()+geom_line()
 ```
