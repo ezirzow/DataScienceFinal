@@ -1,54 +1,78 @@
 ---
-title: "Presentation"
+title: "Your 2017-18 NBA Candidates"
 author: "Eric Zirzow"
-date: "December 5, 2017"
+date: "December 13, 2017"
 output: ioslides_presentation
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
-knitr::opts_chunk$set(cache=TRUE)
+#knitr::opts_chunk$set(cache=TRUE)
 
 library(tidyverse)
 library(bbr)
 year<-get_season(2018)
-playerRankings <- transmute(year, player, tm, pos, PointsRank=(((pts/g)/20)*.25), ReboundsRank=(((trb/g)/10)*.2), AssistsRank=(((ast/g)/5)*.2), StealsRank=(((stl/g)/1.5)*.1), BlocksRank=(((blk/g)/1)*.1), TurnoversRank=(((tov/g)/3)*.1), PctRank=(((fg_pct)/.4)*.05), OverallRank=PointsRank+ReboundsRank+AssistsRank+StealsRank+BlocksRank-TurnoversRank+PctRank)%>%top_n(15)%>%arrange(desc(OverallRank))
+playerRankings <- transmute(year, player, tm, pos, PointsRank=(((pts/g)/20)*.325), ReboundsRank=(((trb/g)/10)*.2), AssistsRank=(((ast/g)/5)*.2), StealsRank=(((stl/g)/1.5)*.1), BlocksRank=(((blk/g)/1)*.1), TurnoversRank=(((tov/g)/3)*.1), PctRank=(((fg_pct)/.5)*.075), OverallRank=PointsRank+ReboundsRank+AssistsRank+StealsRank+BlocksRank-TurnoversRank+PctRank)%>%top_n(15)%>%arrange(desc(OverallRank))
 rankingsForTable<-transmute(playerRankings, player, tm, pos, OverallRank)
 ```
+##Introduction
+-Analyzed the current NBA season to try to predict the 2017-18 MVP
+
+-Formula includes: Points, Rebounds, Assists, Steals, Blocks, Turnovers, and Shooting Percentage
 
 ##Points
+-Based off 20
+
+-Weighted at 32.5%
 ```{r}
 points<-filter(year,pts/g>20)
 ggplot(data=points)+geom_col(mapping=aes(x=player,y=pts/g, fill=pts))+coord_flip()
 ```
 
 ##Rebounds
+-Based off 10
+
+-Weighted at 20%
 ```{r}
 rebounds<-filter(year,trb/g>10)
 ggplot(data=rebounds)+geom_col(mapping=aes(x=player,y=trb/g, fill=trb))+coord_flip()
 ```
 
 ##Assists
+-Based off 10
+
+-Weighted at 20%
 ```{r}
 assists<-filter(year,ast/g>5)
 ggplot(data=assists)+geom_col(mapping=aes(x=player,y=ast/g, fill=ast))+coord_flip()
 ```
 
 ##Steals
+-Based off 1.5
+
+-Weighted at 10%
 ```{r}
 steals<-filter(year,stl/g>1.5)
 ggplot(data=steals)+geom_col(mapping=aes(x=player,y=stl/g, fill=stl))+coord_flip()
 ```
 
 ##Blocks
+-Based off 1.5
+
+-Weighted at 10%
 ```{r}
 blocks<-filter(year,blk/g>1.5)
 ggplot(data=blocks)+geom_col(mapping=aes(x=player,y=blk/g, fill=blk))+coord_flip()
 ```
 
-##Top 10 Table
+##Additional Stats
+-Turnovers based off 3, weighted at -10%
+
+-FG shooting % based off 50%, weighted at 7.5%
+
+##Top 5 Table
 ```{r, warning=FALSE, message=FALSE}
-knitr::kable(rankingsForTable%>%top_n(10), caption = "Overall Rankings")
+knitr::kable(rankingsForTable%>%top_n(5), caption = "Overall Rankings")
 ```
 
 ##Graph of Top 5
@@ -56,3 +80,23 @@ knitr::kable(rankingsForTable%>%top_n(10), caption = "Overall Rankings")
 playerRankings %>% top_n(5) %>% select(-OverallRank) %>% gather(skill, rating, -player, -tm, -pos) %>%
   ggplot(aes(x=skill, y=rating, group=player,color=player))+geom_point()+geom_line()
 ```
+
+##Verification for last 5 years
+-2013: Actual Winner: Lebron James, My winner: LeBron James
+
+-2014: Actual Winner: Kevin Durant, My winner: Kevin Durant
+
+-2015: Actual Winner: Stephen Curry(7), My winner: Anthony Davis(5)
+
+-2016: Actual Winner: Stephen Curry(2), My winner: Russell Westbrook(4)
+
+-2017: Actual Winner: Russell Westbrook, My winner: Russell Westbrook
+
+##Things not factored
+-Team Results
+
+-+/-
+
+-Games Played
+
+-Team Changes compounding stats in database
