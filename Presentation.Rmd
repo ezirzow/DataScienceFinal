@@ -1,7 +1,7 @@
 ---
 title: "Your 2017-18 NBA Candidates"
 author: "Eric Zirzow"
-date: "December 13, 2017"
+date: "December 12, 2017"
 output: ioslides_presentation
 ---
 
@@ -74,6 +74,9 @@ ggplot(data=blocks)+geom_col(mapping=aes(x=player,y=blk/g, fill=blk))+coord_flip
 ```{r, warning=FALSE, message=FALSE}
 knitr::kable(rankingsForTable%>%top_n(5), caption = "Overall Rankings")
 ```
+
+##Code used for Calculations
+playerRankings <- transmute(year, player, tm, pos, PointsRank=(((pts/g)/20)*.325), ReboundsRank=(((trb/g)/10)*.2), AssistsRank=(((ast/g)/5)*.2), StealsRank=(((stl/g)/1.5)*.1), BlocksRank=(((blk/g)/1)*.1), TurnoversRank=(((tov/g)/3)*.1), PctRank=(((fg_pct)/.5)*.075)
 
 ##Graph of Top 5
 ```{r}
